@@ -1,0 +1,141 @@
+NoMoBroHa
+=========
+
+A plugin based on the css_browser_selector to add the browser type and os to either the +body+ and/or +html+
+elements within a document.  The full usage on how to use these css selectors can be understood at:
+
+  http://rafael.adm.br/css_browser_selector/
+
+The initial implementation relies on javascript to place these selectors on the +html+ element. This plugin 
+will add these selectors to a page regardless of whether or not javascript is enabled.  NoMoBroHa is short 
+for "No More Browser Hacks."
+
+NoMoBroHa provides an implementation for +body+ and +html+ content_tags, supplying the css_browser_selectors
+by default.  The original javascript is also supplied and can be rendered inline if this is your preference,
+along with some other helper javascripts.
+
+Body Example
+============
+
+To add css_browser_selectors to your body tag in your layout (make sure you don't output the content with
+<%= %> or you may end up with double content).  Do the following:
+
+  <% body do %>
+    <%= yield %>
+  <% end %>
+
+  This will render, depending on your user agent string:
+
+  <body class="gecko mac">
+    <div>This is a test</div>
+  </body>
+
+HTML Options
+============
+
+You may pass any html_options as you would expect:
+
+  <% body :onload => "alert('yo')" do %>
+    <%= yield %>
+  <% end %>
+
+  Renders: 
+
+  <body class="gecko mac" onload="alert('yo')">
+    <div>This is a test</div>
+  </body>
+
+HTML Example
+============
+
+Or, if you prefer, you can add the css_browser_selectors to your html tag as first realized in the original
+javascript.  
+
+  <% html do %>
+    <head>
+      <title>Example</title>
+    </head>
+  <body>
+    <%= yield %>
+  </body>
+  <% end %>
+
+Renders, by default, with the following attributes (which may be overriden by passing options):
+
+  <html class="gecko mac" xmlns="http://www.w3.org/1999/xhtml" xml:lang=>"en" lang=>"en">
+    <head>
+      <title>Example</title>
+    </head>
+  <body>
+    <div>This is a test</div>
+  </body>
+  </html>
+
+Javascripts
+===========
+
+You can use the plugin just to include the original css_browser_selector javascript inline:
+
+    <%= javascript_tag css_browser_selector %>
+
+Renders, as you would expect:
+
+  <script type="text/javascript">
+  //<![CDATA[
+  var css_browser_selector = function() {
+            	var 
+            		ua=navigator.userAgent.toLowerCase(),
+            		is=function(t){ return ua.indexOf(t) != -1; },
+            		h=document.getElementsByTagName('html')[0],
+            		b=(!(/opera|webtv/i.test(ua))&&/msie (d)/.test(ua))?('ie ie'+RegExp.$1):is('gecko/')? 'gecko':is('opera/9')?'opera opera9':/opera (d)/.test(ua)?'opera opera'+RegExp.$1:is('konqueror')?'konqueror':is('applewebkit/')?'webkit safari':is('mozilla/')?'gecko':'',
+            		os=(is('x11')||is('linux'))?' linux':is('mac')?' mac':is('win')?' win':'';
+            	var c=b+os+' js';
+            	h.className += h.className?' '+c:c;
+            }();
+  //]]>
+  </script>
+  
+To add the 'js' selector to your element, a helper to include inline javascript is available:
+
+  <%= javascript_tag window_on_load_add_js_to_tag(:body) %>
+  
+This will put the following javascript inline:
+
+  <script type="text/javascript">
+  //<![CDATA[
+  Window.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}}
+  Window.addLoadEvent(function(){e=document.getElementsByTagName('body')[0];e.className+=e.className?' js':'js'})
+  //]]>
+  </script>
+
+If you enjoy the +Window.addLoadEvent+ function and wish to use it alone, as a convenience you can:
+
+  <%= javascript_tag window_add_load_event %>
+
+Options
+=======
+
+For those who wish to use the +html+ and +body+ content tags but wish to turn off the css_browser_selectors you can
+turn them off.  For example, if you are using both helpers:
+
+  <% html :exclude_browser_and_os => true do %>
+    <head>
+      <title>Example</title>
+    </head>
+  <% body do %>
+    <%= yield  %>
+  <% end %>
+  <% end %>
+
+Renders:
+
+  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang=>"en" lang=>"en">
+    <head>
+      <title>Example</title>
+    </head>
+  <body class="gecko mac">
+    <div>This is a test</div>
+  </body>
+  </html>
+
+Copyright (c) 2008 Los Angeles Times (http://www.latimes.com) released under the MIT license
