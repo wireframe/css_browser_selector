@@ -6,6 +6,8 @@ elements within a document.  The full usage on how to use these css selectors ca
 
   http://rafael.adm.br/css_browser_selector/
 
+Major Props to Rafael Lima (from above link) who implemented this JS and has helped me with the plugin.
+
 The initial implementation relies on javascript to place these selectors on the +html+ element. This plugin 
 will add these selectors to a page regardless of whether or not javascript is enabled.  NoMoBroHa is short 
 for "No More Browser Hacks."
