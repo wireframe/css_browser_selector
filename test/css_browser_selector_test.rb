@@ -9,13 +9,20 @@ require 'action_view/helpers/css_browser_selector'
 
 # browser strings found at : http://www.zytrax.com/tech/web/browser_ids.htm
 
-class NoMoreBrowserHacksTest < Test::Unit::TestCase
+class TestController
+  attr_accessor :page_cached
+  alias_method :page_cached?, :page_cached
+end
+
+class CssBrowswerSelectorTest < Test::Unit::TestCase
   include ActionView::Helpers::CssBrowserSelector
   include ActionView::Helpers::JavascriptHelper
-  attr_accessor :request
+  attr_accessor :request, :controller
 
   def setup
     self.request = ActionController::TestRequest.new
+    self.controller = TestController.new    
+    self.controller.page_cached = false
   end
 
   def test_html_tag_helper
@@ -83,14 +90,14 @@ class NoMoreBrowserHacksTest < Test::Unit::TestCase
   end
 
   def test_window_add_load_event_script
-    expected = %(<script type="text/javascript">\n//<![CDATA[\nWindow.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}}\n//]]>\n</script>)
+    expected = %(<script type="text/javascript">\n//<![CDATA[\nwindow.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}}\n//]]>\n</script>)
     assert_equal expected, javascript_tag(window_add_load_event)
   end
 
   def test_window_on_load_add_js_to_tag_script
     expected = %(<script type="text/javascript">\n//<![CDATA[\n) +
-               %(Window.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}}\n) +
-               %(Window.addLoadEvent(function(){e=document.getElementsByTagName('body')[0];e.className+=e.className?' js':'js'})\n//]]>\n</script>)
+               %(window.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}}\n) +
+               %(window.addLoadEvent(function(){e=document.getElementsByTagName('body')[0];e.className+=e.className?' js':'js'})\n//]]>\n</script>)
     assert_equal expected, javascript_tag(window_on_load_add_js_to_tag(:body))
   end
   
