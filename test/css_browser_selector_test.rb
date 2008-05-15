@@ -5,12 +5,12 @@ require 'rubygems'
 require 'action_controller'
 require 'action_controller/test_process'
 
-require 'action_view/helpers/no_more_browser_hacks'
+require 'action_view/helpers/css_browser_selector'
 
 # browser strings found at : http://www.zytrax.com/tech/web/browser_ids.htm
 
 class NoMoreBrowserHacksTest < Test::Unit::TestCase
-  include ActionView::Helpers::NoMoreBrowserHacks
+  include ActionView::Helpers::CssBrowserSelector
   include ActionView::Helpers::JavascriptHelper
   attr_accessor :request
 

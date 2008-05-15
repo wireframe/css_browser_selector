@@ -1,5 +1,5 @@
-NoMoBroHa
-=========
+CssBrowserSelector
+==================
 
 A plugin based on the css_browser_selector to add the browser type and os to either the +body+ and/or +html+
 elements within a document.  The full usage on how to use these css selectors can be understood at:
@@ -9,12 +9,14 @@ elements within a document.  The full usage on how to use these css selectors ca
 Major Props to Rafael Lima (from above link) who implemented this JS and has helped me with the plugin.
 
 The initial implementation relies on javascript to place these selectors on the +html+ element. This plugin 
-will add these selectors to a page regardless of whether or not javascript is enabled.  NoMoBroHa is short 
-for "No More Browser Hacks."
+will add these selectors to a page regardless of whether or not javascript is enabled.  
 
-NoMoBroHa provides an implementation for +body+ and +html+ content_tags, supplying the css_browser_selectors
-by default.  The original javascript is also supplied and can be rendered inline if this is your preference,
-along with some other helper javascripts.
+CssBrowserSelector plugin provides an implementation for +body+ and +html+ content_tags, supplying the css_browser_selectors by default.  The original javascript is also supplied and can be rendered inline 
+if this is your preference,  along with some other helper javascripts.
+
+CssBrowswerSelector is aware of Page Caching and tracks each controller's +caches_page+ actions.  If the
+page is cached, CssBrowserSelector will revert to the original javascript only version of css_browser_selector
+the browser and platform _will not_ be cached into the rendered html.  See more in Caching, below.
 
 Body Example
 ============
@@ -97,9 +99,18 @@ Renders, as you would expect:
   //]]>
   </script>
   
-To add the 'js' selector to your element, a helper to include inline javascript is available:
+You can pass the css_browser_selector a string or symbol of the tag in which to place the selectors ('html'
+is the default):
 
-  <%= javascript_tag window_on_load_add_js_to_tag(:body) %>
+    <%= javascript_tag css_browser_selector(:body) %>
+
+Changes this line in the script:
+
+ 		h=document.getElementsByTagName('body')[0],
+
+To add the 'js' selector to your element, a Page Cache aware helper to include inline javascript is available:
+
+  <%= javascript_to_add_js_to :body %>
   
 This will put the following javascript inline:
 
@@ -109,6 +120,12 @@ This will put the following javascript inline:
   Window.addLoadEvent(function(){e=document.getElementsByTagName('body')[0];e.className+=e.className?' js':'js'})
   //]]>
   </script>
+
+This script is included only if the action is not page cached.  If the page is cached, the javascript version
+of css_browser_selector will add the 'js' selector to your element.  If you want to by-pass this Page Caching
+awareness you can:
+
+  <%= javascript_tag window_on_load_add_js_to_tag(:body) %>
 
 If you enjoy the +Window.addLoadEvent+ function and wish to use it alone, as a convenience you can:
 
@@ -139,5 +156,21 @@ Renders:
     <div>This is a test</div>
   </body>
   </html>
+
+Page Caching
+============
+
+CssBrowserSelector keeps track of all the actions that each controller lists in +caches_page+ in a class attribute
+called +page_cached_actions+.  Each controller instance will have a method called page_cached? to determine if the action was listed in +caches_page+ and honors the +perform_caching+ configuration.
+
+Currently, it does _not_ keep track of actions cached directly through +cache_page+, but could be extended in the
+future to handle this need.  Additionally, it does not track action_caching which could also be added at a later
+time.
+
+Both the +page_cached_action+ class variable and +page_cached?+ instance method are added by the ActionController::CachingTracker module and can be accessed from anywhere you can get a reference to a controller:
+
+  CustomController.page_cached_actions #=> ["new", "show"]
+  controller.page_cached_actions       #=> ["new", "show"]
+  controller.page_cached?              #=> true if perform_caching is true and is action_name in page_cached_actions
 
 Copyright (c) 2008 Los Angeles Times (http://www.latimes.com) released under the MIT license

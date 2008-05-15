@@ -1,0 +1,7 @@
+* Fixed Javascript that sets addLoadEvent to Window, IE only knows about window (lowercase 'W') [reidmix]
+
+* The body and html methods are now aware of page caching and revert to javascript version if the action is page cached so that the css selectors will not be saved in the rendered html and be determined dynamically.  Added javascript_to_add_js_to method to encapsulate page caching awareness so that the window_on_load_add_js_to_tag will be removed if page caching is turned on.  Updated documentation. [reidmix]
+
+* Added action_controller/caching_tracker to aid tracking page caching by a controller [reidmix]
+
+* Renamed no_more_browser_hacks to css_browser_selector for consistency with the javascript. [reidmix]

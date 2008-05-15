@@ -1,3 +1,7 @@
 $:.unshift "#{File.dirname(__FILE__)}/lib"
-require 'action_view/helpers/no_more_browser_hacks'
-ActionView::Base.send(:include, ActionView::Helpers::NoMoreBrowserHacks)
+
+require 'action_view/helpers/css_browser_selector'
+ActionView::Base.send(:include, ActionView::Helpers::CssBrowserSelector)
+
+require 'action_controller/caching_tracker'
+ActionController::Base.send(:include, ActionController::CachingTracker)

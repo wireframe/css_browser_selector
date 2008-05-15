@@ -4,14 +4,14 @@ require 'action_view/helpers/capture_helper'
 
 module ActionView
   module Helpers
-    module NoMoreBrowserHacks
+    module CssBrowserSelector
       include TagHelper
       include TextHelper
       include CaptureHelper
 
       # Javascript version of the CSS Browser Selector, can be put inline into the page / layout
       # by <%= javascript_tag css_browser_selector %>
-      def css_browser_selector
+      def css_browser_selector(tag = 'html')
         # CSS Browser Selector   v0.2.5
         # Documentation:         http://rafael.adm.br/css_browser_selector
         # License:               http://creativecommons.org/licenses/by/2.5/
@@ -21,7 +21,7 @@ module ActionView
           	var 
           		ua=navigator.userAgent.toLowerCase(),
           		is=function(t){ return ua.indexOf(t) != -1; },
-          		h=document.getElementsByTagName('html')[0],
+          		h=document.getElementsByTagName('#{tag}')[0],
           		b=(!(/opera|webtv/i.test(ua))&&/msie (\d)/.test(ua))?('ie ie'+RegExp.$1):is('gecko/')? 'gecko':is('opera/9')?'opera opera9':/opera (\d)/.test(ua)?'opera opera'+RegExp.$1:is('konqueror')?'konqueror':is('applewebkit/')?'webkit safari':is('mozilla/')?'gecko':'',
           		os=(is('x11')||is('linux'))?' linux':is('mac')?' mac':is('win')?' win':'';
           	var c=b+os+' js';
@@ -34,7 +34,7 @@ module ActionView
       # can be added inline, standalone like so:
       #   <%= javascript_tag window_add_load_event %>
       def window_add_load_event
-        %(Window.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}})
+        %(window.addLoadEvent = function(f){var oldf=window.onload; window.onload=(typeof window.onload!='function')?f:function(){oldf();f();}})
       end
 
       # Combines the window_add_load_event and window_add_js_to_tag methods to be run within one
@@ -42,6 +42,15 @@ module ActionView
       #   <%= javascript_tag window_on_load_add_js_to_tag(:body) %>
       def window_on_load_add_js_to_tag(tagname)
         "#{window_add_load_event}\n#{window_add_js_to_tag(tagname)}"
+      end
+      
+      # Page cached aware helper method that is equivalent to:
+      #   <%= javascript_tag window_on_load_add_js_to_tag(tag) unless controller.page_cached? %>
+      #
+      # Example: if you are using the body content element:
+      #   <%= javascript_to_add_js_to :body %>
+      def javascript_to_add_js_to(tag)
+        javascript_tag window_on_load_add_js_to_tag(tag) unless controller.page_cached? 
       end
       
       # Creates the html content element with css_browser_selectors added to its class attribute.
@@ -78,17 +87,20 @@ module ActionView
       # +Window.addLoadEvent+ method to be added (with the window_add_load_event method)
       #   <%= javascript_tag window_add_js_to_tag(:body)
       def window_add_js_to_tag(tagname)
-        %(Window.addLoadEvent(function(){e=document.getElementsByTagName('#{tagname}')[0];e.className+=e.className?' js':'js'}))
+        %(window.addLoadEvent(function(){e=document.getElementsByTagName('#{tagname}')[0];e.className+=e.className?' js':'js'}))
       end
 
       # Underlying content builder for both the +html+ and +body+ functions
       def add_css_browser_selectors_to_tag(tag, html_options = {}, &block)
         html_options ||= {}
         exclude_browser_and_os = html_options.delete(:exclude_browser_and_os)
-        unless exclude_browser_and_os or (bros = determine_browser_and_os).empty?
+        unless exclude_browser_and_os or (bros = determine_browser_and_os).empty? or controller.page_cached?
           html_options[:class] = html_options[:class] ? "#{html_options[:class]} #{bros}" : bros 
         end
-        content = content_tag tag, (capture(&block) if block_given?), html_options
+        content = content_tag tag, 
+                  (controller.page_cached? ? "\n" + javascript_tag(css_browser_selector(tag)) : "") +
+                  (capture(&block) if block_given?), 
+                  html_options
         concat(content, block.binding)
       end
       
