@@ -28,7 +28,7 @@ class CssBrowswerSelectorTest < Test::Unit::TestCase
   def test_html_tag_helper
     _erbout = ''
     request.env["HTTP_USER_AGENT"]="Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6" 
-    expected = %(<html class="gecko mac" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml"><body>test</body></html>)
+    expected = %(<html class="gecko ff2 mac" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml"><body>test</body></html>)
     html { _erbout.concat "<body>test</body>" } 
     assert_dom_equal expected, _erbout    
   end
@@ -36,7 +36,7 @@ class CssBrowswerSelectorTest < Test::Unit::TestCase
   def test_body_tag_helper
     _erbout = ''    
     request.env["HTTP_USER_AGENT"]="Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6" 
-    expected = %(<body class="gecko mac"><div>test</div></body>)
+    expected = %(<body class="gecko ff2 mac"><div>test</div></body>)
     body { _erbout.concat "<div>test</div>" } 
     assert_dom_equal expected, _erbout
   end
@@ -76,7 +76,7 @@ class CssBrowswerSelectorTest < Test::Unit::TestCase
   def test_html_continues_to_pass_html_options
     _erbout = ''    
     request.env["HTTP_USER_AGENT"]="Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6" 
-    expected = %(<html id="news" class="sports gecko mac" xml:lang="en" lang="fr" xmlns="http://www.w3.org/1999/xhtml"><body>test</body></html>)
+    expected = %(<html id="news" class="sports gecko ff2 mac" xml:lang="en" lang="fr" xmlns="http://www.w3.org/1999/xhtml"><body>test</body></html>)
     html(:lang=>"fr", :id=>"news", :class=>"sports") { _erbout.concat "<body>test</body>" } 
     assert_dom_equal expected, _erbout
   end
@@ -84,7 +84,7 @@ class CssBrowswerSelectorTest < Test::Unit::TestCase
   def test_body_continues_to_pass_html_options
     _erbout = ''    
     request.env["HTTP_USER_AGENT"]="Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6" 
-    expected = %(<body onclick="alert('yo')" class="message gecko mac"><div>test</div></body>)
+    expected = %(<body onclick="alert('yo')" class="message gecko ff2 mac"><div>test</div></body>)
     body(:onclick=>"alert('yo')", :class => "message") { _erbout.concat "<div>test</div>" } 
     assert_dom_equal expected, _erbout
   end
@@ -136,11 +136,11 @@ class CssBrowswerSelectorTest < Test::Unit::TestCase
 
   def test_firefox_browser_strings
     assert_browser_strings({ 
-      "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"      => "gecko mac",
+      "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"      => "gecko ff2 mac",
       "Mozilla/5.0 (X11; U; Darwin Power Macintosh; en-US; rv:1.8.0.12) Gecko/20070803 Firefox/1.5.0.12 Fink Community Edition" => "gecko mac", # firefox 1.5 darwin
-      "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9a7) Gecko/2007080210 GranParadiso/3.0a7"     => "gecko win",   # firefox dev
-      "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9b2pre) Gecko/2007120505 Minefield/3.0b2pre"  => "gecko win",   # firefox dev
-      "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-GB; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"      => "gecko win",   # firefox 2 vista
+      "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9a7) Gecko/2007080210 GranParadiso/3.0a7"     => "gecko win",       # firefox dev
+      "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9b2pre) Gecko/2007120505 Minefield/3.0b2pre"  => "gecko win",       # firefox dev
+      "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-GB; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11"      => "gecko ff2 win",   # firefox 2 vista
       "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.13) Gecko/20060410 Firefox/1.0.8"           => "gecko win",   # firefox 1 xp
       "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.3) Gecko/20041002 Firefox/0.10.1"           => "gecko win",   # firefox pre v1
       "Mozilla/5.0 (X11; U; SunOS sun4m; en-US; rv:1.4b) Gecko/20030517 Mozilla Firebird/0.6"             => "gecko linux", # firefox firebird
@@ -152,7 +152,7 @@ class CssBrowswerSelectorTest < Test::Unit::TestCase
 
   def test_navigator_browser_strings
     assert_browser_strings({ 
-      "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.8pre) Gecko/20071019 Firefox/2.0.0.8 Navigator/9.0.0.1" => "gecko win",   # Navigator 9 with Firefox fixes
+      "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.8pre) Gecko/20071019 Firefox/2.0.0.8 Navigator/9.0.0.1" => "gecko ff2 win",   # Navigator 9 with Firefox fixes
       "Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.7.5) Gecko/20050519 Netscape/8.0.1"                         => "gecko win",   # A real Firefox based Netscape 8 with a security patch (already) on Win 2K
       "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.2) Gecko/20040804 Netscape/7.2 (ax)"                      => "gecko win",   # Netscape 7.2 and still we're wondering what's the (ax)? 
       "Mozilla/5.0 (Windows; U; WinNT4.0; en-CA; rv:0.9.4) Gecko/20011128 Netscape6/6.2.1"                              => "gecko win",   # NS 6.2.1 on NT4.0.

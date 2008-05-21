@@ -11,22 +11,17 @@ module ActionView
 
       # Javascript version of the CSS Browser Selector, can be put inline into the page / layout
       # by <%= javascript_tag css_browser_selector %>
-      def css_browser_selector(tag = 'html')
-        # CSS Browser Selector   v0.2.5
-        # Documentation:         http://rafael.adm.br/css_browser_selector
-        # License:               http://creativecommons.org/licenses/by/2.5/
-        # Author:                Rafael Lima (http://rafael.adm.br)
-        # Contributors:          http://rafael.adm.br/css_browser_selector#contributors
-        %(var css_browser_selector = function() {
-          	var 
-          		ua=navigator.userAgent.toLowerCase(),
-          		is=function(t){ return ua.indexOf(t) != -1; },
-          		h=document.getElementsByTagName('#{tag}')[0],
-          		b=(!(/opera|webtv/i.test(ua))&&/msie (\d)/.test(ua))?('ie ie'+RegExp.$1):is('gecko/')? 'gecko':is('opera/9')?'opera opera9':/opera (\d)/.test(ua)?'opera opera'+RegExp.$1:is('konqueror')?'konqueror':is('applewebkit/')?'webkit safari':is('mozilla/')?'gecko':'',
-          		os=(is('x11')||is('linux'))?' linux':is('mac')?' mac':is('win')?' win':'';
-          	var c=b+os+' js';
-          	h.className += h.className?' '+c:c;
-          }();)
+      #
+      # Can pass in an tag name in which the script will place the css browser selectors:
+      # <%= javascript_tag css_browser_selector('body')
+      # 
+      # To turn off comments for the smallest javascript possible, pass false as a second parameter:
+      # <%= javascript_tag css_browser_selector('body', false)
+      #
+      # This file is originally read off of disk from within the plugin's lib at javascripts/css_browser_selector.js
+      def css_browser_selector(tag = 'html', show_comments = true)
+        @javascript ||= ::CssBrowserSelector::Javascript.contents(show_comments)
+        @javascript.gsub('html', tag)
       end
       
       # Inline javascript to creates an addLoadEvent method on Window to allow onload functions to 
@@ -98,7 +93,7 @@ module ActionView
           html_options[:class] = html_options[:class] ? "#{html_options[:class]} #{bros}" : bros 
         end
         content = content_tag tag, 
-                  (controller.page_cached? ? "\n" + javascript_tag(css_browser_selector(tag)) : "") +
+                  (controller.page_cached? ? "\n" + javascript_tag(css_browser_selector(tag, false)) : "") +
                   (capture(&block) if block_given?), 
                   html_options
         concat(content, block.binding)
@@ -108,25 +103,26 @@ module ActionView
       def determine_browser_and_os(ua = request.env["HTTP_USER_AGENT"])
         ua = (ua||"").downcase
         br = (!(/opera|webtv/i=~ua)&&/msie (\d)/=~ua) ?      
-             "ie ie"+Regexp.last_match(1) :                  # ie
-             ua.include?("gecko/") ? "gecko" :               # ns
-             ua.include?("opera/9") ? "opera opera9" :       # opera 9 only
+             'ie ie'+Regexp.last_match(1) :                  # ie
+             ua.include?('firefox/2') ? 'gecko ff2' :        # ff2 explicitly
+             ua.include?('firefox/3') ? 'gecko ff3' :        # ff3 explicitly
+             ua.include?('gecko/') ? 'gecko' :               # ns
+             ua.include?('opera/9') ? 'opera opera9' :       # opera 9 only
              /opera (\d)/=~ua || /opera\/(\d)/=~ua ? 
-             "opera opera"+Regexp.last_match(1) :            # opera 
-             ua.include?("konqueror") ? "konqueror" :        # konqueror
+             'opera opera'+Regexp.last_match(1) :            # opera 
+             ua.include?('konqueror') ? 'konqueror' :        # konqueror
              /applewebkit\/(\d+)/=~ua ?           
              (build = Regexp.last_match(1).to_i) &&
-             "webkit safari safari" +                        # safari
+             'webkit safari safari' +                        # safari
                 (/version\/(\d+)/=~ua ? 
                 Regexp.last_match(1) : 
-                (build >= 400) ? "2" : "1") :                 # safari version
-             ua.include?("mozilla/") ? "gecko" : nil         # ff
-        os = ua.include?("mac") || ua.include?("darwin") ? ua.include?("iphone") ? "iphone mac" : ua.include?("ipod") ? "ipod mac" : "mac" :
-             ua.include?("x11") || ua.include?("linux") ? "linux" : 
-             ua.include?("win") ? "win" : nil
+                (build >= 400) ? '2' : '1') :                 # safari version
+             ua.include?('mozilla/') ? 'gecko' : nil          # ff
+        os = ua.include?('mac') || ua.include?('darwin') ? ua.include?('iphone') ? 'iphone mac' : ua.include?('ipod') ? 'ipod mac' : 'mac' :
+             ua.include?('x11') || ua.include?('linux') ? 'linux' : 
+             ua.include?('win') ? 'win' : nil
         "#{br}#{" " unless br.nil? or os.nil?}#{os}"
       end
-      
     end
   end
 end

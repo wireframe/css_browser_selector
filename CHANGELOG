@@ -1,3 +1,9 @@
+* updated	ruby version of	determine_browser_and_os to match version v0.2.7 of css_browser_selector which adds firefox versions keeping additions for safari version and additions to os for iphone and ipod.
+
+* Added class to load javascript from expected location within the plugin, offering helpers to inspect version and	remove comments. css_browser_selector method relies on this file loader to get the javascript.
+
+* Updated	tests to reflect firefox versions (2/3)
+
 * Fixed Javascript that sets addLoadEvent to Window, IE only knows about window (lowercase 'W') [reidmix]
 
 * The body and html methods are now aware of page caching and revert to javascript version if the action is page cached so that the css selectors will not be saved in the rendered html and be determined dynamically.  Added javascript_to_add_js_to method to encapsulate page caching awareness so that the window_on_load_add_js_to_tag will be removed if page caching is turned on.  Updated documentation. [reidmix]
