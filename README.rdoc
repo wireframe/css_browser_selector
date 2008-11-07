@@ -1,5 +1,4 @@
-CssBrowserSelector
-==================
+= CssBrowserSelector
 
 A plugin based on the css_browser_selector to add the browser type and os to either the +body+ and/or +html+
 elements within a document.  The full usage on how to use these css selectors can be understood at:
@@ -18,11 +17,10 @@ CssBrowswerSelector is aware of Page Caching and tracks each controller's +cache
 page is cached, CssBrowserSelector will revert to the original javascript only version of css_browser_selector
 the browser and platform _will not_ be cached into the rendered html.  See more in Caching, below.
 
-Body Example
-============
+== Body Example
 
 To add css_browser_selectors to your body tag in your layout (make sure you don't output the content with
-<%= %> or you may end up with double content).  Do the following:
++<%= %>+ or you may end up with double content).  Do the following:
 
   <% body do %>
     <%= yield %>
@@ -34,8 +32,7 @@ To add css_browser_selectors to your body tag in your layout (make sure you don'
     <div>This is a test</div>
   </body>
 
-HTML Options
-============
+== HTML Options
 
 You may pass any html_options as you would expect:
 
@@ -43,14 +40,13 @@ You may pass any html_options as you would expect:
     <%= yield %>
   <% end %>
 
-  Renders: 
+Renders: 
 
   <body class="gecko mac" onload="alert('yo')">
     <div>This is a test</div>
   </body>
 
-HTML Example
-============
+== HTML Example
 
 Or, if you prefer, you can add the css_browser_selectors to your html tag as first realized in the original
 javascript.  
@@ -75,8 +71,7 @@ Renders, by default, with the following attributes (which may be overriden by pa
   </body>
   </html>
 
-Javascripts
-===========
+== Javascripts
 
 You can use the plugin just to include the original css_browser_selector javascript inline:
 
@@ -131,8 +126,7 @@ If you enjoy the +Window.addLoadEvent+ function and wish to use it alone, as a c
 
   <%= javascript_tag window_add_load_event %>
 
-Options
-=======
+== Options
 
 For those who wish to use the +html+ and +body+ content tags but wish to turn off the css_browser_selectors you can
 turn them off.  For example, if you are using both helpers:
@@ -157,8 +151,7 @@ Renders:
   </body>
   </html>
 
-Page Caching
-============
+== Page Caching
 
 CssBrowserSelector keeps track of all the actions that each controller lists in +caches_page+ in a class attribute
 called +page_cached_actions+.  Each controller instance will have a method called page_cached? to determine if the action was listed in +caches_page+ and honors the +perform_caching+ configuration.
@@ -167,7 +160,7 @@ Currently, it does _not_ keep track of actions cached directly through +cache_pa
 future to handle this need.  Additionally, it does not track action_caching which could also be added at a later
 time.
 
-Both the +page_cached_action+ class variable and +page_cached?+ instance method are added by the ActionController::CachingTracker module and can be accessed from anywhere you can get a reference to a controller:
+Both the +page_cached_action+ class variable and +page_cached?+ instance method are added by the +ActionController::CachingTracker+ module and can be accessed from anywhere you can get a reference to a controller:
 
   CustomController.page_cached_actions #=> ["new", "show"]
   controller.page_cached_actions       #=> ["new", "show"]
