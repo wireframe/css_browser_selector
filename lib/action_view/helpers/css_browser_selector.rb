@@ -96,7 +96,7 @@ module ActionView
                   (controller.page_cached? ? "\n" + javascript_tag(css_browser_selector(tag, false)) : "") +
                   (capture(&block) if block_given?), 
                   html_options
-        concat(content, block.binding)
+        concat(content)
       end
       
       # The ruby version of the CSS Browser Selector with some additions
